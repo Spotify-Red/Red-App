@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.spotify_red_app"
+    namespace "com.example.spotify_red_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
