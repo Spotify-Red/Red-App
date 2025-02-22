@@ -17,6 +17,10 @@ dependencies:
   url_launcher: ^6.1.5
   http: ^0.13.4
   shared_preferences:
+  firebase_core:
+  firebase_auth:
+  get_it:
+  dartz:
 
 
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "688460802866",
+    "project_id": "sp27rednewapp",
+    "storage_bucket": "sp27rednewapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:688460802866:android:23aaac254a431ee83f852b",
+        "android_client_info": {
+          "package_name": "com.example.spotify_red_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOURLoOfvgwMro2pGfCAsIzv5_oLCC1eU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
