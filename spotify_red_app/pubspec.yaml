@@ -17,8 +17,7 @@ dependencies:
   url_launcher: ^6.1.5
   http: ^0.13.4
   shared_preferences:
-
-
+  spotify_sdk:
 
 dev_dependencies:
   flutter_test:
