@@ -20,12 +20,7 @@ class GetStartedPage extends StatelessWidget {
               horizontal: 40
             ),
             decoration: BoxDecoration(
-              image: DecorationImage(
-                fit: BoxFit.fill,
-                image: AssetImage(
-                  AppImages.introBG
-                )
-              )
+              
             ),
           ),
           Container(
@@ -49,7 +44,6 @@ class GetStartedPage extends StatelessWidget {
                     'Enjoy Listening to Music',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
                       fontSize: 18
                     ),
                   ),
@@ -58,7 +52,6 @@ class GetStartedPage extends StatelessWidget {
                     'Enjoy Listening to MusicEnjoy Listening to MusicEnjoy Listening to MusicEnjoy Listening to MusicEnjoy Listening to MusicEnjoy Listening to Music',
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      color: AppColors.gray,
                       fontSize: 14
                     ),
                     textAlign: TextAlign.center,

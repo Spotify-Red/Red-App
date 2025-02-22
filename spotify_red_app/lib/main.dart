@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
@@ -10,9 +9,7 @@ import 'package:spotify_red_app/presentation/splash/pages/splash.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory: kIsWeb
-    ? HydratedStorage.webStorageDirectory
-    : await getApplicationDocumentsDirectory(),
+    storageDirectory: await getApplicationDocumentsDirectory(),
   );
   runApp(const MainApp());
 }
@@ -24,14 +21,15 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => ThemeCubit())
+        BlocProvider(create: (_) => ThemeCubit()),
       ],
-      child: BlocBuilder<ThemeCubit,ThemeMode>(
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, mode) => MaterialApp(
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: mode,
-          home: const SplashPage()
+          debugShowCheckedModeBanner: false,
+          home: const SplashPage(),
         ),
       ),
     );

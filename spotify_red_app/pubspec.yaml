@@ -12,11 +12,12 @@ dependencies:
   
   flutter_svg:
   flutter_bloc:
-  hydrated_bloc: ^9.1.0
+  hydrated_bloc:
   path_provider:
   url_launcher: ^6.1.5
   http: ^0.13.4
-  uni_links: ^0.5.1
+  shared_preferences:
+
 
 
 dev_dependencies:

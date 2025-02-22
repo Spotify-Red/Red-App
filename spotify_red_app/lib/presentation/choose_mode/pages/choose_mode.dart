@@ -3,11 +3,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:spotify_red_app/common/helpers/is_dark.dart';
 import 'package:spotify_red_app/common/widgets/button/basic_app_button.dart';
-import 'package:spotify_red_app/core/configs/assets/app_images.dart';
 import 'package:spotify_red_app/core/configs/assets/app_vectors.dart';
+import 'package:spotify_red_app/presentation/authentication/pages/signup_or_signin.dart';
 import 'package:spotify_red_app/presentation/choose_mode/bloc/theme_cubit.dart';
-import 'package:spotify_red_app/presentation/sign_in/pages/sign_in.dart';
 
 class ChooseModePage extends StatelessWidget {
   const ChooseModePage({super.key});
@@ -22,14 +22,14 @@ class ChooseModePage extends StatelessWidget {
               vertical: 40,
               horizontal: 40
             ),
-            decoration: BoxDecoration(
+            /*decoration: BoxDecoration(
               image: DecorationImage(
                 fit: BoxFit.fill,
                 image: AssetImage(
                   AppImages.chooseModeBG
                 )
               )
-            ),
+            ),*/
           ),
           Container(
             color: Colors.black.withAlpha(38)
@@ -52,7 +52,6 @@ class ChooseModePage extends StatelessWidget {
                     'Choose Mode',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
                       fontSize: 18
                     ),
                   ),
@@ -76,8 +75,23 @@ class ChooseModePage extends StatelessWidget {
                                     shape: BoxShape.circle,
                                     color: Color(0xff30393C).withAlpha(12),
                                   ),
-                                  child: SvgPicture.asset(
-                                    AppVectors.moon
+                                  child: IconButton(
+                                    onPressed: () {
+                                      context.read<ThemeCubit>().updateTheme(ThemeMode.dark);
+                                    },
+                                    icon: Container(
+                                      height: 50,
+                                      width: 50,
+                                      decoration: BoxDecoration(
+                                        color: context.isDarkMode ? Colors.white.withAlpha(8) : Colors.black.withAlpha(9),
+                                        shape: BoxShape.circle
+                                      ),
+                                      child: Icon(
+                                        Icons.nightlight_round,
+                                        size: 15,
+                                        color: context.isDarkMode ? Colors.white : Colors.black,
+                                      ),
+                                    )
                                   ),
                                 ),
                               ),
@@ -89,7 +103,6 @@ class ChooseModePage extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
-                              color: Colors.white
                             ),
                           )
                         ],
@@ -111,8 +124,23 @@ class ChooseModePage extends StatelessWidget {
                                     shape: BoxShape.circle,
                                     color: Color(0xff30393C).withAlpha(12),
                                   ),
-                                  child: SvgPicture.asset(
-                                    AppVectors.sun
+                                  child: IconButton(
+                                    onPressed: () {
+                                      context.read<ThemeCubit>().updateTheme(ThemeMode.light);
+                                    },
+                                    icon: Container(
+                                      height: 50,
+                                      width: 50,
+                                      decoration: BoxDecoration(
+                                        color: context.isDarkMode ? Colors.white.withAlpha(8) : Colors.black.withAlpha(9),
+                                        shape: BoxShape.circle
+                                      ),
+                                      child: Icon(
+                                        Icons.sunny,
+                                        size: 15,
+                                        color: context.isDarkMode ? Colors.white : Colors.black,
+                                      ),
+                                    )
                                   ),
                                 ),
                               ),
@@ -124,7 +152,6 @@ class ChooseModePage extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
-                              color: Colors.white
                             ),
                           )
                         ],
@@ -137,7 +164,7 @@ class ChooseModePage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (BuildContext context) => const SignInPage()
+                          builder: (BuildContext context) => const SignupOrSigninPage()
                         )
                       );
                     },

@@ -3,19 +3,23 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 class ThemeCubit extends HydratedCubit<ThemeMode> {
   ThemeCubit() : super(ThemeMode.system);
-  
-void updateTheme(ThemeMode themeMode) => emit(themeMode);
+
+  void updateTheme(ThemeMode themeMode) => emit(themeMode);
 
   @override
   ThemeMode? fromJson(Map<String, dynamic> json) {
-    // TODO: implement fromJson
-    throw UnimplementedError();
+    switch (json['theme']) {
+      case 'dark':
+        return ThemeMode.dark;
+      case 'light':
+        return ThemeMode.light;
+      default:
+        return ThemeMode.system;
+    }
   }
 
   @override
   Map<String, dynamic>? toJson(ThemeMode state) {
-    // TODO: implement toJson
-    throw UnimplementedError();
+    return {'theme': state.toString().split('.').last};
   }
-  
 }
