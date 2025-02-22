@@ -26,11 +26,11 @@ class SignupPage extends StatelessWidget {
           height: 40,
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(
-          vertical: 50,
-          horizontal: 30
-        ),
+        vertical: 50,
+        horizontal: 30
+      ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
