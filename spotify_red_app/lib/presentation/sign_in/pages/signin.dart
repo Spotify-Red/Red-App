@@ -21,6 +21,7 @@ class SigninPageSpotify extends StatelessWidget {
                 redirectUrl: "myapp://callback",
                 scope: "app-remote-control, user-modify-playback-state, playlist-read-private",
               );
+
               // Store the token in the bloc.
               context.read<SpotifyAuthBloc>().add(SetSpotifyToken(token));
               // Navigate to the root page.

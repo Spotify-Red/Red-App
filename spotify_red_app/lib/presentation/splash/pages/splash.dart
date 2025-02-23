@@ -19,10 +19,15 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
+    // Check the current state of SpotifyAuthBloc on first frame.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final state = context.read<SpotifyAuthBloc>().state;
+      _redirectBasedOnAuthState(state);
+    });
+
     // Delay navigation to allow splash to show.
     Future.delayed(const Duration(seconds: 2), () {
       if (!_hasRedirected) {
-        // If after delay no authentication state is detected, go to GetStartedPage.
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const GetStartedPage()),
@@ -32,7 +37,9 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   void _redirectBasedOnAuthState(SpotifyAuthState state) {
-    if (!_hasRedirected && (state is SpotifyTokenStored || state is SpotifyProfileLoaded)) {
+    print("Checking state: ${state}");
+    if (!_hasRedirected &&
+        (state is SpotifyTokenStored || state is SpotifyProfileLoaded)) {
       _hasRedirected = true;
       Navigator.pushReplacement(
         context,
@@ -45,7 +52,7 @@ class _SplashPageState extends State<SplashPage> {
   Widget build(BuildContext context) {
     return BlocListener<SpotifyAuthBloc, SpotifyAuthState>(
       listener: (context, state) {
-        // When the SpotifyAuthBloc state indicates authentication, redirect immediately.
+        print("Bloc state changed: $state");
         _redirectBasedOnAuthState(state);
       },
       child: Scaffold(
