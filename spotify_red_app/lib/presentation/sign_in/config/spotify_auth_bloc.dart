@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:http/http.dart' as http;
 
 // --- Model ---
@@ -14,16 +14,27 @@ class SpotifyUserProfile {
   final String type;
   final String uri;
 
-  SpotifyUserProfile({required this.displayName, required this.externalURLs, required this.followers, required this.href, required this.id, required this.image, required this.type, required this.uri});
+  SpotifyUserProfile({
+    required this.displayName,
+    required this.externalURLs,
+    required this.followers,
+    required this.href,
+    required this.id,
+    required this.image,
+    required this.type,
+    required this.uri,
+  });
 
   factory SpotifyUserProfile.fromJson(Map<String, dynamic> json) {
     return SpotifyUserProfile(
       displayName: json['display_name'] ?? 'Unknown',
       externalURLs: json['external_urls']['spotify'] ?? 'Unknown',
-      followers: json['followers']['total'] ?? 'Unknown',
+      followers: json['followers']['total'] ?? 0,
       href: json['href'] ?? 'Unknown',
       id: json['id'] ?? 'Unknown',
-      image: json['images'][0]['url'] ?? 'Unknown',
+      image: (json['images'] != null && json['images'].isNotEmpty)
+          ? json['images'][0]['url'] ?? 'Unknown'
+          : 'Unknown',
       type: json['type'] ?? 'Unknown',
       uri: json['uri'] ?? 'Unknown',
     );
@@ -75,8 +86,8 @@ class SpotifyAuthError extends SpotifyAuthState {
   SpotifyAuthError(this.error);
 }
 
-// --- Bloc Implementation ---
-class SpotifyAuthBloc extends Bloc<SpotifyAuthEvent, SpotifyAuthState> {
+// --- Bloc Implementation using HydratedBloc ---
+class SpotifyAuthBloc extends HydratedBloc<SpotifyAuthEvent, SpotifyAuthState> {
   final SpotifyRepository repository;
   String? _token;
 
@@ -97,5 +108,30 @@ class SpotifyAuthBloc extends Bloc<SpotifyAuthEvent, SpotifyAuthState> {
         }
       }
     });
+  }
+
+  // Public getter for the stored token
+  String? get storedToken => _token;
+
+  @override
+  SpotifyAuthState? fromJson(Map<String, dynamic> json) {
+    try {
+      final token = json['token'] as String?;
+      if (token != null) {
+        _token = token;
+        return SpotifyTokenStored(token);
+      }
+      return SpotifyAuthInitial();
+    } catch (_) {
+      return SpotifyAuthInitial();
+    }
+  }
+
+  @override
+  Map<String, dynamic>? toJson(SpotifyAuthState state) {
+    if (_token != null) {
+      return {'token': _token};
+    }
+    return null;
   }
 }
