@@ -6,14 +6,26 @@ import 'package:http/http.dart' as http;
 // --- Model ---
 class SpotifyUserProfile {
   final String displayName;
-  final String email;
+  final String externalURLs;
+  final int followers;
+  final String href;
+  final String id;
+  final String image;
+  final String type;
+  final String uri;
 
-  SpotifyUserProfile({required this.displayName, required this.email});
+  SpotifyUserProfile({required this.displayName, required this.externalURLs, required this.followers, required this.href, required this.id, required this.image, required this.type, required this.uri});
 
   factory SpotifyUserProfile.fromJson(Map<String, dynamic> json) {
     return SpotifyUserProfile(
       displayName: json['display_name'] ?? 'Unknown',
-      email: json['email'] ?? 'Unknown',
+      externalURLs: json['external_urls']['spotify'] ?? 'Unknown',
+      followers: json['followers']['total'] ?? 'Unknown',
+      href: json['href'] ?? 'Unknown',
+      id: json['id'] ?? 'Unknown',
+      image: json['images'][0]['url'] ?? 'Unknown',
+      type: json['type'] ?? 'Unknown',
+      uri: json['uri'] ?? 'Unknown',
     );
   }
 }

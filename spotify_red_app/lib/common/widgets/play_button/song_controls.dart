@@ -14,6 +14,7 @@ class SongControls extends StatefulWidget {
 class _SongControlsState extends State<SongControls> {
   bool _isPlaying = false;
   Uint8List? _imageData;
+  late List _trackData;
 
   @override
   void initState() {
@@ -26,16 +27,21 @@ class _SongControlsState extends State<SongControls> {
       final playerState = await SpotifySdk.getPlayerState();
       
       if (playerState?.track != null) {
+        final trackTitle = playerState!.track!.name;
+        final trackArtist = playerState.track!.artists.firstOrNull?.name;
+        final trackAlbum = playerState.track!.album.name;
         final imageData = await SpotifySdk.getImage(
           imageUri: playerState!.track!.imageUri,
           dimension: ImageDimension.large,
         );
         setState(() {
           _imageData = imageData;
+          _trackData = [trackTitle, trackArtist, trackAlbum];
         });
       } else {
         setState(() {
           _imageData = null;
+          _trackData = ["","",""];
         });
       }
       setState(() {
@@ -83,6 +89,9 @@ class _SongControlsState extends State<SongControls> {
               )
             : const Center(child: Text('No track playing')),
         ),
+        _imageData != null ? Text(_trackData[0].toString()) : Text("Title"),
+        _imageData != null ? Text(_trackData[1].toString()) : Text("Artist"),
+        _imageData != null ? Text(_trackData[2].toString()) : Text("Alubum"),
         Row(
           children: [
             IconButton(

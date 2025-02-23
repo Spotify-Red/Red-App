@@ -1,11 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:spotify_red_app/common/helpers/is_dark.dart';
 import 'package:spotify_red_app/common/widgets/appbar/app_bar.dart';
 import 'package:spotify_red_app/common/widgets/play_button/song_controls.dart';
+import 'package:spotify_red_app/core/configs/assets/app_vectors.dart';
 import 'package:spotify_red_app/core/configs/theme/app_colors.dart';
 import 'package:spotify_red_app/presentation/sign_in/config/spotify_auth_bloc.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
+import 'package:http/http.dart' as http;
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});
@@ -22,8 +28,15 @@ class Root extends State<RootPage> {
     connectToSpotifyRemote();
     return Scaffold(
       bottomNavigationBar: _navBar(),
-      appBar: BasicAppbar(),
-      body: <Widget>[BlocBuilder<SpotifyAuthBloc, SpotifyAuthState>(
+      appBar: BasicAppbar(
+        title: SvgPicture.asset(
+          AppVectors.logo,
+          height: 40,
+        ),
+      ),
+      body: <Widget>[
+        // FEED ==============================================================
+        BlocBuilder<SpotifyAuthBloc, SpotifyAuthState>(
         builder: (context, state) {
           if (state is SpotifyProfileLoaded) {
             return Center(
@@ -43,6 +56,8 @@ class Root extends State<RootPage> {
           return const Center(child: CircularProgressIndicator());
         },
       ),
+
+      // LIBRARY ==============================================================
       BlocBuilder<SpotifyAuthBloc, SpotifyAuthState>(
         builder: (context, state) {
           if (state is SpotifyProfileLoaded) {
@@ -68,6 +83,8 @@ class Root extends State<RootPage> {
           return const Center(child: CircularProgressIndicator());
         },
       ),
+
+      // PROFILE ==============================================================
       BlocBuilder<SpotifyAuthBloc, SpotifyAuthState>(
         builder: (context, state) {
           if (state is SpotifyProfileLoaded) {
@@ -75,7 +92,28 @@ class Root extends State<RootPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  
+                  ClipOval(
+                    child: state.profile.image != 'Unknown' ? Image.network(
+                      state.profile.image,
+                      fit: BoxFit.fill,
+                      width: 200,
+                    ) : Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: context.isDarkMode ? Colors.white.withAlpha(50) : Colors.black.withAlpha(50),
+                      ),
+                      width: 200,
+                      child: Text(
+                        state.profile.displayName[0],
+                        style: TextStyle(
+                          fontSize: 100,
+                          fontWeight: FontWeight.bold
+                        ),
+                        textAlign: TextAlign.center,
+                      )
+                    ),
+                  ),                  
+                  Text(state.profile.displayName),
                 ],
               ),
             );
@@ -102,17 +140,19 @@ class Root extends State<RootPage> {
       },
       indicatorColor: AppColors.primary,
       selectedIndex: currentPageIndex,
-      destinations: const <Widget>[
+      destinations: <Widget>[
         NavigationDestination(
-          selectedIcon: Icon(Icons.home),
+          selectedIcon: Icon(Icons.home, color: !context.isDarkMode ? Colors.white : Colors.white),
           icon: Icon(Icons.home),
           label: 'Feed',
         ),
         NavigationDestination(
+          selectedIcon: Icon(Icons.library_music, color: !context.isDarkMode ? Colors.white : Colors.white),
           icon: Icon(Icons.library_music),
           label: 'Library',
         ),
         NavigationDestination(
+          selectedIcon: Icon(Icons.portrait_rounded, color: !context.isDarkMode ? Colors.white : Colors.white),
           icon: Icon(Icons.portrait_rounded),
           label: 'Profile',
         ),
