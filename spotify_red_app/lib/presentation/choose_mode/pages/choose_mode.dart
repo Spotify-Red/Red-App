@@ -6,7 +6,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spotify_red_app/common/helpers/is_dark.dart';
 import 'package:spotify_red_app/common/widgets/button/basic_app_button.dart';
 import 'package:spotify_red_app/core/configs/assets/app_vectors.dart';
-import 'package:spotify_red_app/presentation/authentication/pages/signup_or_signin.dart';
 import 'package:spotify_red_app/presentation/choose_mode/bloc/theme_cubit.dart';
 import 'package:spotify_red_app/presentation/sign_in/pages/signin.dart';
 

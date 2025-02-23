@@ -21,18 +21,14 @@ class SigninPageSpotify extends StatelessWidget {
                 redirectUrl: "myapp://callback",
                 scope: "app-remote-control, user-modify-playback-state, playlist-read-private",
               );
-              if (token != null) {
-                // Store the token in the bloc.
-                context.read<SpotifyAuthBloc>().add(SetSpotifyToken(token));
-                // Navigate to the root page.
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const RootPage()),
-                );
-              } else {
-                debugPrint("Token is null");
-              }
-            } catch (e) {
+              // Store the token in the bloc.
+              context.read<SpotifyAuthBloc>().add(SetSpotifyToken(token));
+              // Navigate to the root page.
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const RootPage()),
+              );
+                        } catch (e) {
               debugPrint("Error obtaining token: $e");
             }
           },
