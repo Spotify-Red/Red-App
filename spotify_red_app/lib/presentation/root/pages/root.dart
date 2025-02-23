@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spotify_red_app/common/widgets/button/basic_app_button.dart';
+import 'package:spotify_red_app/common/widgets/play_button/song_controls.dart';
+import 'package:spotify_red_app/core/configs/theme/app_colors.dart';
 import 'package:spotify_red_app/presentation/sign_in/config/spotify_auth_bloc.dart';
+import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 
 class RootPage extends StatelessWidget {
@@ -22,8 +25,12 @@ class RootPage extends StatelessWidget {
                 children: [
                   Text("Name: ${state.profile.displayName}"),
                   Text("Email: ${state.profile.email}"),
-                  BasicAppButton(onPressed: play, title: 'Play'),
-                  BasicAppButton(onPressed: pause, title: 'Pause')
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SongControls()
+                    ],
+                  )
                 ],
               ),
             );
@@ -64,6 +71,13 @@ Future<void> pause() async {
   }
 }
 
+Future<void> skipNext() async {
+  await SpotifySdk.skipNext();
+}
+
+Future<void> skipPrevious() async {
+  await SpotifySdk.skipPrevious();
+}
 
 Future<void> connectToSpotifyRemote() async {
   try {
@@ -75,5 +89,15 @@ Future<void> connectToSpotifyRemote() async {
     print(e);
   } on MissingPluginException {
     print('MissingPluginException');
+  }
+}
+
+Future getPlayerState() async {
+  try {
+    return await SpotifySdk.getPlayerState();
+  } on PlatformException catch (e) {
+    print(e);
+  } on MissingPluginException {
+    print('not implemented');
   }
 }
