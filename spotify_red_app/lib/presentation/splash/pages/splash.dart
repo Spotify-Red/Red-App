@@ -32,6 +32,11 @@ class _SplashPageState extends State<SplashPage> {
           context,
           MaterialPageRoute(builder: (_) => const GetStartedPage()),
         );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const RootPage()),
+      );
       }
     });
   }
@@ -41,10 +46,6 @@ class _SplashPageState extends State<SplashPage> {
     if (!_hasRedirected &&
         (state is SpotifyTokenStored || state is SpotifyProfileLoaded)) {
       _hasRedirected = true;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const RootPage()),
-      );
     }
   }
 

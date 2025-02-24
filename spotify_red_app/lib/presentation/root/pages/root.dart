@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spotify_red_app/common/helpers/is_dark.dart';
 import 'package:spotify_red_app/common/widgets/appbar/app_bar.dart';
+import 'package:spotify_red_app/common/widgets/button/basic_app_button.dart';
 import 'package:spotify_red_app/common/widgets/play_button/song_controls.dart';
 import 'package:spotify_red_app/core/configs/assets/app_vectors.dart';
 import 'package:spotify_red_app/core/configs/theme/app_colors.dart';
@@ -40,14 +41,8 @@ class Root extends State<RootPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: _navBar(),
-      appBar: BasicAppbar(
-        title: SvgPicture.asset(
-          AppVectors.logo,
-          height: 40,
-        ),
-      ),
       body: <Widget>[
-        // FEED
+        // FEED =======================================================
         BlocBuilder<SpotifyAuthBloc, SpotifyAuthState>(
           builder: (context, state) {
             if (state is SpotifyProfileLoaded) {
@@ -55,7 +50,7 @@ class Root extends State<RootPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Feed content goes here.
+                    BasicAppButton(onPressed: () async {print(await SpotifyHTTPRequest.getRequest(context, '/me/top/artists'));}, title: 'title')
                   ],
                 ),
               );
@@ -68,7 +63,8 @@ class Root extends State<RootPage> {
             return const Center(child: CircularProgressIndicator());
           },
         ),
-        // LIBRARY
+        
+        // LIBRARY =======================================================
         BlocBuilder<SpotifyAuthBloc, SpotifyAuthState>(
           builder: (context, state) {
             if (state is SpotifyProfileLoaded) {
@@ -91,7 +87,8 @@ class Root extends State<RootPage> {
             return const Center(child: CircularProgressIndicator());
           },
         ),
-        // PROFILE
+
+        // PROFILE =======================================================
         BlocBuilder<SpotifyAuthBloc, SpotifyAuthState>(
           builder: (context, state) {
             if (state is SpotifyProfileLoaded) {

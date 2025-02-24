@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:http/http.dart' as http;
@@ -41,12 +43,43 @@ class SpotifyUserProfile {
   }
 }
 
+class SpotifyHTTPRequest {
+  static Future<List> getRequest(BuildContext context, endpoint) async {
+    final token = context.read<SpotifyAuthBloc>().storedToken;
+
+    final response = await http.get(
+      Uri.parse('https://api.spotify.com/v1$endpoint'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode == 200) {
+      return [response.body];
+    } else {
+      throw Exception('https://api.spotify.com/v1${endpoint} - received ${response.statusCode} response');
+    }
+  }
+
+  static Future<List> postRequest(BuildContext context, endpoint) async {
+    final token = context.read<SpotifyAuthBloc>().storedToken;
+    
+    final response = await http.post(
+      Uri.parse('https://api.spotify.com/v1/me'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode == 200) {
+      return [response.body];
+    } else {
+      throw Exception('Failed to load profile - received ${response.statusCode} response');
+    }
+  }
+}
+
 // --- Repository ---
 class SpotifyRepository {
   Future<SpotifyUserProfile> fetchUserProfile(String token) async {
+    print(token);
     final response = await http.get(
       Uri.parse('https://api.spotify.com/v1/me'),
-      headers: {'Authorization': 'Bearer $token'},
+      headers: {'Authorization': 'Bearer ${token}'},
     );
     if (response.statusCode == 200) {
       return SpotifyUserProfile.fromJson(jsonDecode(response.body));
