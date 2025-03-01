@@ -51,7 +51,7 @@ class SigninPageSpotify extends StatelessWidget {
                   await DatabaseAPI.createUser(uid, uid);
                 }
         
-                final databaseToken = await DatabaseAPI.getAccessToken();
+                final databaseToken = await DatabaseAPI.getAccessToken(uid: uid);
                 if (databaseToken != null) {
                   await TokenStorageService().setDatabaseToken(databaseToken);
                   await TokenStorageService().setDatabaseUid(uid);

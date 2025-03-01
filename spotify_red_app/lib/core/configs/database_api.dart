@@ -31,15 +31,26 @@ class DatabaseAPI {
     }
   }
 
-  static Future<Map<String, dynamic>?> getUser() async {
+  static Future<Map<String, dynamic>?> getUser([String? username]) async {
     final accessToken = await _getStoredToken();
-    final uid = await _getStoredUid();
-    if (accessToken == null || uid == null) {
-      print("No access token or UID stored.");
-      return null;
-    }
+    var uri;
 
-    final uri = Uri.parse("$baseUrl/get_user.php?code=$clientId&access_token=$accessToken&uid=$uid");
+    if(username == null) {
+      final uid = await _getStoredUid();
+      if (accessToken == null || uid == null) {
+        print("No access token or UID stored.");
+        return null;
+      }
+
+      uri = Uri.parse("$baseUrl/get_user.php?code=$clientId&access_token=$accessToken&uid=$uid");
+    } else {
+      if (accessToken == null) {
+        print("No access token or UID stored.");
+        return null;
+      }
+
+      uri = Uri.parse("$baseUrl/get_user.php?code=$clientId&access_token=$accessToken&username=$username");
+    }
 
     try {
       final response = await http.get(uri);
@@ -74,17 +85,26 @@ class DatabaseAPI {
     }
   }
 
-  static Future<bool> createFriendRequest(String toUid, String fromUid) async {
+  static Future<bool> createFriendRequest(String username) async {
     final accessToken = await _getStoredToken();
+    final userUid = await _getStoredUid();
     if (accessToken == null) return false;
 
-    final uri = Uri.parse("$baseUrl/create_friend_request.php?code=$clientId&access_token=$accessToken&touid=$toUid&fromuid=$fromUid");
+    final friendData = await getUser(username);
+
+    if(friendData == null || friendData.toString().contains("User not found")) {
+      return false;
+    }
+
+    final uid = friendData.toString().substring(27, 52);
+
+    final uri = Uri.parse("$baseUrl/create_request.php?code=$clientId&access_token=$accessToken&to=$uid&from=$userUid");
 
     try {
       final response = await http.get(uri);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return data['status'] == "success";
+        return data['status'] == "200";
       } else {
         throw Exception("Failed to send friend request (${response.statusCode})");
       }
@@ -98,7 +118,7 @@ class DatabaseAPI {
     final accessToken = await _getStoredToken();
     if (accessToken == null) return false;
 
-    final uri = Uri.parse("$baseUrl/respond_friend_request.php?code=$clientId&access_token=$accessToken&touid=$toUid&fromuid=$fromUid&action=$responseAction");
+    final uri = Uri.parse("$baseUrl/respond_request.php?code=$clientId&access_token=$accessToken&to=$toUid&from=$fromUid&response=$responseAction");
 
     try {
       final response = await http.get(uri);
@@ -119,7 +139,7 @@ class DatabaseAPI {
     final uid = await _getStoredUid();
     if (accessToken == null || uid == null) return null;
 
-    final uri = Uri.parse("$baseUrl/get_friend_requests.php?code=$clientId&access_token=$accessToken&uid=$uid");
+    final uri = Uri.parse("$baseUrl/get_requests.php?code=$clientId&access_token=$accessToken&uid=$uid");
 
     try {
       final response = await http.get(uri);
