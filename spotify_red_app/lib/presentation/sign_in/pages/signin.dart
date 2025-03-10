@@ -33,7 +33,7 @@ class SigninPageSpotify extends StatelessWidget {
                 final spotifyToken = await SpotifySdk.getAccessToken(
                   clientId: "96ff1332017242f0b78cdbb128c3f07d",
                   redirectUrl: "myapp://callback",
-                  scope: "app-remote-control, user-modify-playback-state, playlist-read-private, user-top-read, playlist-modify-private, user-library-modify, user-library-read",
+                  scope: "app-remote-control, user-modify-playback-state, playlist-read-private, user-top-read, playlist-modify-private, user-library-modify, user-library-read, user-read-recently-played, user-read-playback-state",
                 );
         
                 final profile = await http.get(

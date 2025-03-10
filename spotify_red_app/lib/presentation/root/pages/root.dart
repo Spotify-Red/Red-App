@@ -7,6 +7,7 @@ import 'package:spotify_red_app/common/widgets/appbar/app_bar.dart';
 import 'package:spotify_red_app/common/widgets/button/basic_app_button.dart';
 import 'package:spotify_red_app/common/widgets/play_button/song_controls.dart';
 import 'package:spotify_red_app/core/configs/database_api.dart';
+import 'package:spotify_red_app/core/configs/spotify_api.dart';
 import 'package:spotify_red_app/core/configs/theme/app_colors.dart';
 import 'package:spotify_red_app/core/configs/storage_service.dart';
 import 'package:spotify_red_app/core/configs/database_auth.dart';
@@ -24,6 +25,7 @@ class Root extends State<RootPage> {
   int friendPageIndex = 0;
   String? _spotifyToken;
   List<Widget> _friendRequests = [Text('data')];
+  List<Widget> _playlists = [Text('data')];
   DatabaseUserProfile? _databaseProfile;
 
   @override
@@ -46,13 +48,17 @@ class Root extends State<RootPage> {
     });
 
     refreshFriendRequests();
+    refreshPlaylists();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: _navBar(),
-      body: _pages[currentPageIndex],
+      body: Scaffold(
+        bottomNavigationBar: _songBar(),
+        body: _pages[currentPageIndex],
+      ) 
     );
   }
 
@@ -92,14 +98,19 @@ class Root extends State<RootPage> {
 
   Widget _libraryPage() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [SongControls()],
-          ),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            BasicAppButton(
+              onPressed: () async {refreshPlaylists();},
+              title: 'Refresh'
+            ),
+            Column(
+              children: _playlists,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -259,6 +270,17 @@ class Root extends State<RootPage> {
     );
   }
 
+  Widget _songBar() {
+    return SizedBox(
+      height: 80,
+      child: Row(
+        children: [
+          SongControls()
+        ],
+      ),
+    );
+  }
+
   void refreshFriendRequests() async {
     List<Widget> requests = [];
     dynamic friendRequestsJSON = (await DatabaseAPI.getFriendRequests());
@@ -322,6 +344,46 @@ class Root extends State<RootPage> {
 
     setState(() {
       _friendRequests = requests;
+    });
+  }
+
+  void refreshPlaylists() async {
+    List<Widget> playlists = [];
+    dynamic playlistJSON = (await SpotifyAPI.getPlaylists())?['items'];
+
+    for (var playlist in playlistJSON) {
+      playlists.add(
+        Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () async {
+                  SpotifyAPI.playMusic(playlist['id']);
+                  SongControls.updatePlayback();
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(width: 1.0, color: Colors.grey),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 10),
+                      Text(playlist['id']),
+                      Text(playlist['name'])
+                    ],
+                  ),
+                ),
+              ),
+            )
+          ],
+        )
+      );
+    }
+
+    setState(() {
+      _playlists = playlists;
     });
   }
 }
