@@ -2,15 +2,19 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:spotify_red_app/common/helpers/is_dark.dart';
 import 'package:spotify_red_app/common/widgets/appbar/app_bar.dart';
 import 'package:spotify_red_app/common/widgets/button/basic_app_button.dart';
 import 'package:spotify_red_app/common/widgets/play_button/song_controls.dart';
+import 'package:spotify_red_app/core/configs/assets/app_images.dart';
+import 'package:spotify_red_app/core/configs/assets/app_vectors.dart';
 import 'package:spotify_red_app/core/configs/database_api.dart';
 import 'package:spotify_red_app/core/configs/spotify_api.dart';
 import 'package:spotify_red_app/core/configs/theme/app_colors.dart';
 import 'package:spotify_red_app/core/configs/storage_service.dart';
 import 'package:spotify_red_app/core/configs/database_auth.dart';
+import 'package:spotify_red_app/core/configs/theme/app_theme.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 
 class RootPage extends StatefulWidget {
@@ -26,6 +30,7 @@ class Root extends State<RootPage> {
   String? _spotifyToken;
   List<Widget> _friendRequests = [Text('data')];
   List<Widget> _playlists = [Text('data')];
+  List<Widget> _reviews = [Text('No Reviews Found')];
   DatabaseUserProfile? _databaseProfile;
 
   @override
@@ -47,13 +52,20 @@ class Root extends State<RootPage> {
       _databaseProfile = profile;
     });
 
-    refreshFriendRequests();
-    refreshPlaylists();
+    //refreshFriendRequests();
+    //refreshPlaylists();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(20.0),
+        child: Column(children: [
+              SvgPicture.asset(AppVectors.logo),
+            ]
+          )
+        ),
       bottomNavigationBar: _navBar(),
       body: Scaffold(
         bottomNavigationBar: _songBar(),
@@ -66,7 +78,7 @@ class Root extends State<RootPage> {
     _feedPage(),
     _libraryPage(),
     _friendPage(),
-    _profilePage(),
+    _profilePage()
   ];
   
   List<Widget> get _friendPages => [
@@ -76,22 +88,49 @@ class Root extends State<RootPage> {
 
   Widget _feedPage() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const SizedBox(height: 20), // Spacing
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 20), // Spacing
+            if (_databaseProfile != null)
+              Column(
+                children: [
+                  BasicAppButton(
+                    onPressed: () async { refreshReviews(); },
+                    title: 'Refresh',
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Column(
+                      children: _reviews,
+                    ),
+                  )
+                ],
+              )
+            else
+              const CircularProgressIndicator(),
+          ],
+        ),
+      ),
+    );
+  }
 
-          if (_databaseProfile != null)
+  Widget _reviewPage() {
+    return Center(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            BasicAppButton(
+              onPressed: () async {refreshPlaylists();},
+              title: 'Refresh'
+            ),
             Column(
-              children: [
-                Text("Database Username: ${_databaseProfile!.username}"),
-                Text("Friends: ${_databaseProfile!.friends}"),
-                Text("Privacy Level: ${_databaseProfile!.privacy}"),
-              ],
-            )
-          else
-            const CircularProgressIndicator(),
-        ],
+              children: _playlists,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -120,10 +159,17 @@ class Root extends State<RootPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (_spotifyToken != null)
-            BasicAppButton(
-              onPressed: TokenStorageService().clearAll,
-              title: 'Delete Stored Data'
+          if (_spotifyToken != null && _databaseProfile != null)
+            Column(
+              children: [
+                BasicAppButton(
+                  onPressed: TokenStorageService().clearAll,
+                  title: 'Delete Stored Data'
+                ),
+                Text("Database Username: ${_databaseProfile!.username}"),
+                Text("Friends: ${_databaseProfile!.friends}"),
+                Text("Privacy Level: ${_databaseProfile!.privacy}"),
+              ]
             )
           else
             const CircularProgressIndicator()
@@ -271,15 +317,22 @@ class Root extends State<RootPage> {
   }
 
   Widget _songBar() {
-    return SizedBox(
-      height: 80,
-      child: Row(
-        children: [
-          SongControls()
-        ],
-      ),
+    return SongControls(
+      onReviewPressed: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ReviewsPage(
+              title: 'Some Title',
+              artist: 'Some Artist',
+              album: 'Some Album',
+              URI: 'Some URI',
+            ),
+          ),
+        );
+      },
     );
   }
+
 
   void refreshFriendRequests() async {
     List<Widget> requests = [];
@@ -384,6 +437,53 @@ class Root extends State<RootPage> {
 
     setState(() {
       _playlists = playlists;
+    });
+  }
+
+  void refreshReviews() async {
+    List<Widget> reviews = [];
+    dynamic reviewJSON = await DatabaseAPI.getReviews();
+
+    for (var review in reviewJSON) {
+      reviews.add(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    review['title'].toString(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    review['body'].toString()
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                const Icon(Icons.star, color: Colors.amber),
+                const SizedBox(width: 4),
+                Text(
+                  review['rating'].toString(),
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+          ],
+        )
+      );
+    }
+
+    setState(() {
+      _reviews = reviews;
     });
   }
 }

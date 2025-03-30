@@ -19,6 +19,7 @@ dependencies:
   shared_preferences:
   spotify_sdk: ^3.0.2
   flutter_secure_storage: ^9.0.0
+  flutter_rating_stars:
 
 dev_dependencies:
   flutter_test:

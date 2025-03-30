@@ -29,7 +29,7 @@ class SpotifyAPI {
 
       final uid = (await DatabaseAPI.getUser(username))?['uid'].toString;
 
-      uri = Uri.parse("$baseUrl/me/users/$uid/playlists");
+      uri = Uri.parse("$baseUrl/users/$uid/playlists");
     } else {
       uri = Uri.parse("$baseUrl/me/playlists");
     }
@@ -40,6 +40,9 @@ class SpotifyAPI {
       );
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
+      } else if (response.statusCode == 401) {
+        getNewAccessToken();
+        return getPlaylists();
       } else {
         throw Exception("Failed to fetch user (${response.statusCode})");
       }
@@ -53,4 +56,21 @@ class SpotifyAPI {
     await SpotifySdk.play(spotifyUri: uri);
     SongControls.updatePlayback();
   }
+
+
+
+  static Future<void> getNewAccessToken() async {
+    final spotifyToken = await SpotifySdk.getAccessToken(
+      clientId: "96ff1332017242f0b78cdbb128c3f07d",
+      redirectUrl: "myapp://callback",
+      scope: "app-remote-control, user-modify-playback-state, playlist-read-private, user-top-read, playlist-modify-private, user-library-modify, user-library-read, user-read-recently-played, user-read-playback-state",
+    );
+
+    await TokenStorageService().setSpotifyToken(spotifyToken);
+  }
+
+
+
+
+
 }

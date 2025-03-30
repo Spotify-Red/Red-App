@@ -154,4 +154,44 @@ class DatabaseAPI {
       return null;
     }
   }
+
+  static Future<List<Map<String, dynamic>>?> getReviews() async {
+    final accessToken = await _getStoredToken();
+    final uid = await _getStoredUid();
+    if (accessToken == null || uid == null) return null;
+
+    final uri = Uri.parse("$baseUrl/get_reviews.php?code=$clientId&access_token=$accessToken&uid=$uid");
+
+    try {
+      final response = await http.get(uri);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return List<Map<String, dynamic>>.from(data['reviews']);
+      } else {
+        throw Exception("Failed to fetch reviews (${response.statusCode})");
+      }
+    } catch (e) {
+      print("Error in getReviews: $e");
+      return null;
+    }
+  }
+
+  static Future<void> createReviews(String songUID, String title, String rating, String body) async {
+    final accessToken = await _getStoredToken();
+    final uid = await _getStoredUid();
+    if (accessToken == null || uid == null);
+
+    final uri = Uri.parse("$baseUrl/create_review.php?code=$clientId&access_token=$accessToken&uid=$uid&rating=$rating&review=$body&review_uid=$songUID&name=$title");
+
+    try {
+      final response = await http.get(uri);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+      } else {
+        throw Exception("Failed to fetch reviews (${response.statusCode})");
+      }
+    } catch (e) {
+      print("Error in createReview: $e");
+    }
+  }
 }
